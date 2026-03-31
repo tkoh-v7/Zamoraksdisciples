@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pledge Faith to the Lord</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Application</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="board.html">Message Board</a>
+        <a href="apply.html">Apply</a>
+        <a href="members.html">Members</a>
+      </nav>
+    </div>
 
+    <section class="card">
+      <h2>Apply</h2>
+
+      <label for="applyRsn">RSN</label>
+      <input id="applyRsn" maxlength="24" placeholder="RuneScape name">
+
+      <label for="applyCombat">Combat Level</label>
+      <input id="applyCombat" maxlength="3" placeholder="e.g. 126">
+
+      <label for="applyDiscord">Discord</label>
+      <input id="applyDiscord" maxlength="50" placeholder="optional">
+
+      <label for="applyReason">Why do you want to join?</label>
+      <textarea id="applyReason" maxlength="1000" placeholder="Tell us why"></textarea>
+
+      <input id="applyWebsite" class="hidden" tabindex="-1" autocomplete="off" placeholder="Leave blank">
+
+      <div style="margin-top:12px">
+        <button class="primary" id="applyBtn">Submit Application</button>
+      </div>
+
+      <div id="applyStatus" style="margin-top:12px"></div>
+    </section>
+  </div>
+
+  <script src="clan.js"></script>
+  <script>
+    document.getElementById("applyBtn").addEventListener("click", submitClanApplication);
+  </script>
+</body>
+</html>
