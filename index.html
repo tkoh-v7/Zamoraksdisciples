@@ -1,43 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Disciples of Zamorak</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Disciples of Zamorak</h1>
+      <p>Clan hub for members, applicants, and anybody looking to join the crew.</p>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="board.html">Message Board</a>
+        <a href="apply.html">Apply</a>
+        <a href="members.html">Members</a>
+        <a class="primary" href="https://discord.gg/" target="_blank" rel="noopener">Join Discord</a>
+      </nav>
+      <p class="small muted">Replace the Discord link with your real invite.</p>
+    </div>
 
-<h1>Clan Board</h1>
+    <div class="grid">
+      <section class="card">
+        <h2>Welcome</h2>
+        <p>This site is for our Castle Wars clan. Use the board to leave messages, hit apply if you want in, and check the members list.</p>
+      </section>
 
-<input id="name" placeholder="Name"><br>
-<textarea id="msg" placeholder="Message"></textarea><br>
-<button onclick="post()">Post</button>
-
-<h2>Messages</h2>
-<div id="feed"></div>
-
-<script>
-const API = "https://damp-mud-ecd0.r-2007scaper.workers.dev";
-
-async function post() {
-  await fetch(API + "/api/clan/message", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      name: name.value,
-      message: msg.value
-    })
-  });
-
-  load();
-}
-
-async function load() {
-  const res = await fetch(API + "/api/clan/messages");
-  const data = await res.json();
-
-  feed.innerHTML = data.map(x =>
-    `<p><b>${x.name}</b>: ${x.message}</p>`
-  ).join("");
-}
-
-load();
-</script>
-
+      <section class="card">
+        <h2>Quick Links</h2>
+        <p><a href="board.html">Go to Message Board</a></p>
+        <p><a href="apply.html">Submit an Application</a></p>
+        <p><a href="members.html">View Members</a></p>
+      </section>
+    </div>
+  </div>
 </body>
 </html>
