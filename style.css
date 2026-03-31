@@ -1,41 +1,108 @@
 :root{
-  --bg:#111318;
-  --panel:#1b1f27;
-  --panel2:#242b36;
-  --text:#f2f4f8;
-  --muted:#aab3c2;
-  --line:#313a48;
+  --bg:#070707;
+  --panel:#121212;
+  --panel2:#1a1a1a;
+
+  --text:#e6e6e6;
+  --muted:#888;
+
+  --line:#2a0d0d;
+
+  --primary:#b30000;
+  --primary-glow:#ff1a1a;
+
   --gold:#d8b35c;
   --green:#5fd18b;
-  --red:#ff7373;
+  --red:#ff4d4d;
 }
+
+/* =========================
+   BASE
+========================= */
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:linear-gradient(180deg,#0e1014,#151922);
+  background:
+    radial-gradient(circle at top, rgba(120,0,0,0.2), transparent 40%),
+    linear-gradient(180deg,#050505,#0a0a0a);
   color:var(--text);
 }
+
+/* =========================
+   LAYOUT
+========================= */
+
 .wrap{
   max-width:1000px;
   margin:0 auto;
   padding:20px;
 }
-.hero,.card{
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  background:linear-gradient(180deg,#140000,#0a0a0a);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:16px;
+  text-align:center;
+  position:relative;
+}
+
+.hero h1{
+  color:var(--primary);
+  font-size:2.4rem;
+  text-shadow:0 0 12px rgba(255,0,0,0.5);
+}
+
+.hero p{
+  color:var(--muted);
+}
+
+/* faint zamorak symbol */
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:url("https://oldschool.runescape.wiki/images/Zamorak_symbol.png") center/120px no-repeat;
+  opacity:0.03;
+  pointer-events:none;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:16px;
   padding:18px;
   margin-bottom:16px;
+  transition:0.2s;
 }
-h1,h2,h3{margin:0 0 12px}
-p{color:var(--muted); line-height:1.5}
+
+.card:hover{
+  border-color:var(--primary);
+}
+
+/* =========================
+   NAV
+========================= */
+
 nav{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
   margin-bottom:16px;
 }
+
 nav a, button{
   background:var(--panel2);
   color:var(--text);
@@ -45,46 +112,106 @@ nav a, button{
   text-decoration:none;
   cursor:pointer;
   font-weight:700;
+  transition:0.2s;
 }
+
+nav a:hover, button:hover{
+  border-color:var(--primary);
+  box-shadow:0 0 8px rgba(255,0,0,0.3);
+}
+
+/* primary buttons */
 button.primary,a.primary{
-  background:var(--gold);
-  color:#17120a;
-  border-color:#c69d46;
+  background:linear-gradient(180deg,#b30000,#660000);
+  color:white;
+  border-color:#400000;
 }
+
+button.primary:hover,a.primary:hover{
+  background:var(--primary-glow);
+  box-shadow:0 0 10px rgba(255,0,0,0.6);
+}
+
+/* =========================
+   GRID
+========================= */
+
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px;
 }
-@media (max-width:800px){ .grid{grid-template-columns:1fr} }
-label{display:block;margin:10px 0 6px;color:#d7dce6;font-weight:700}
+
+@media (max-width:800px){
+  .grid{grid-template-columns:1fr}
+}
+
+/* =========================
+   FORMS
+========================= */
+
+label{
+  display:block;
+  margin:10px 0 6px;
+  color:#d7dce6;
+  font-weight:700;
+}
+
 input,textarea{
   width:100%;
   padding:12px;
   border-radius:10px;
   border:1px solid var(--line);
-  background:#10141b;
+  background:#0a0a0a;
   color:var(--text);
+  transition:0.2s;
 }
-textarea{min-height:120px;resize:vertical}
+
+input:focus,textarea:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 6px rgba(255,0,0,0.4);
+}
+
+textarea{
+  min-height:120px;
+  resize:vertical;
+}
+
+/* =========================
+   TEXT STATES
+========================= */
+
 .muted{color:var(--muted)}
 .success{color:var(--green);font-weight:700}
 .error{color:var(--red);font-weight:700}
+
+/* =========================
+   MESSAGE BOARD
+========================= */
+
 .message{
   border:1px solid var(--line);
   border-radius:12px;
   padding:12px;
   margin-top:10px;
-  background:#121722;
+  background:#0f0f0f;
+  border-left:3px solid var(--primary);
 }
+
 .message .top{
   display:flex;
   justify-content:space-between;
   gap:10px;
   margin-bottom:8px;
-  color:#dfe5ef;
+  color:#fff;
   font-weight:700;
 }
+
+/* =========================
+   MEMBERS
+========================= */
+
 .member{
   display:flex;
   justify-content:space-between;
@@ -93,7 +220,29 @@ textarea{min-height:120px;resize:vertical}
   border:1px solid var(--line);
   border-radius:12px;
   margin-top:10px;
-  background:#121722;
+  background:#0f0f0f;
+  transition:0.2s;
 }
+
+.member:hover{
+  border-color:var(--primary);
+}
+
+/* =========================
+   UTIL
+========================= */
+
 .hidden{display:none}
 .small{font-size:12px}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+  width:6px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:var(--primary);
+}
