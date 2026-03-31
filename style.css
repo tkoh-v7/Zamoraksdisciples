@@ -1,1 +1,99 @@
-
+:root{
+  --bg:#111318;
+  --panel:#1b1f27;
+  --panel2:#242b36;
+  --text:#f2f4f8;
+  --muted:#aab3c2;
+  --line:#313a48;
+  --gold:#d8b35c;
+  --green:#5fd18b;
+  --red:#ff7373;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(180deg,#0e1014,#151922);
+  color:var(--text);
+}
+.wrap{
+  max-width:1000px;
+  margin:0 auto;
+  padding:20px;
+}
+.hero,.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px;
+}
+h1,h2,h3{margin:0 0 12px}
+p{color:var(--muted); line-height:1.5}
+nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+nav a, button{
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 14px;
+  text-decoration:none;
+  cursor:pointer;
+  font-weight:700;
+}
+button.primary,a.primary{
+  background:var(--gold);
+  color:#17120a;
+  border-color:#c69d46;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media (max-width:800px){ .grid{grid-template-columns:1fr} }
+label{display:block;margin:10px 0 6px;color:#d7dce6;font-weight:700}
+input,textarea{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#10141b;
+  color:var(--text);
+}
+textarea{min-height:120px;resize:vertical}
+.muted{color:var(--muted)}
+.success{color:var(--green);font-weight:700}
+.error{color:var(--red);font-weight:700}
+.message{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  margin-top:10px;
+  background:#121722;
+}
+.message .top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  color:#dfe5ef;
+  font-weight:700;
+}
+.member{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin-top:10px;
+  background:#121722;
+}
+.hidden{display:none}
+.small{font-size:12px}
