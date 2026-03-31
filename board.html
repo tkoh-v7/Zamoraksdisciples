@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Clan Message Board</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Clan Message Board</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="board.html">Message Board</a>
+        <a href="apply.html">Apply</a>
+        <a href="members.html">Members</a>
+      </nav>
+    </div>
 
+    <section class="card">
+      <h2>Post Message</h2>
+
+      <label for="boardName">Name</label>
+      <input id="boardName" maxlength="24" placeholder="Your name">
+
+      <label for="boardMessage">Message</label>
+      <textarea id="boardMessage" maxlength="500" placeholder="Write your message"></textarea>
+
+      <input id="boardWebsite" class="hidden" tabindex="-1" autocomplete="off" placeholder="Leave blank">
+
+      <div style="margin-top:12px">
+        <button class="primary" id="postBtn">Post Message</button>
+      </div>
+
+      <div id="boardStatus" style="margin-top:12px"></div>
+    </section>
+
+    <section class="card">
+      <h2>Messages</h2>
+      <div id="boardFeed"></div>
+    </section>
+  </div>
+
+  <script src="clan.js"></script>
+  <script>
+    document.getElementById("postBtn").addEventListener("click", submitClanMessage);
+    loadClanMessages();
+  </script>
+</body>
+</html>
