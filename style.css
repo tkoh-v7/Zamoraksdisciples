@@ -1,248 +1,627 @@
-:root{
-  --bg:#070707;
-  --panel:#121212;
-  --panel2:#1a1a1a;
+/* ============================================================
+   ZAMORAK CSS THEME — CHAOS ETERNAL
+   Modern dark fantasy / arcane-evil aesthetic
+   Fonts: Cinzel Decorative (display) + Rajdhani (body)
+   ============================================================ */
 
-  --text:#e6e6e6;
-  --muted:#888;
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
-  --line:#2a0d0d;
+/* =========================
+   TOKENS
+========================= */
 
-  --primary:#b30000;
-  --primary-glow:#ff1a1a;
+:root {
+  /* Core palette */
+  --bg:           #050305;
+  --bg-mid:       #0a0608;
+  --panel:        #100810;
+  --panel2:       #160e16;
+  --panel3:       #1e1220;
 
-  --gold:#d8b35c;
-  --green:#5fd18b;
-  --red:#ff4d4d;
+  /* Text */
+  --text:         #e8dde8;
+  --text-bright:  #f5ecf5;
+  --muted:        #6b5870;
+
+  /* Brand */
+  --primary:      #cc0000;
+  --primary-dim:  #7a0000;
+  --primary-glow: #ff1a1a;
+  --blood:        #8b0000;
+
+  /* Accent */
+  --gold:         #c9a227;
+  --gold-dim:     #7a5e0f;
+  --gold-glow:    #f0c040;
+  --arcane:       #9b30d0;
+  --arcane-dim:   #4a1560;
+  --arcane-glow:  #bf5fff;
+
+  /* States */
+  --green:        #3dba72;
+  --red:          #ff3333;
+
+  /* Borders */
+  --line:         rgba(140, 0, 0, 0.22);
+  --line-bright:  rgba(200, 0, 0, 0.45);
+
+  /* Glow intensities */
+  --glow-sm:      0 0 8px rgba(204,0,0,0.35);
+  --glow-md:      0 0 16px rgba(204,0,0,0.45), 0 0 32px rgba(140,0,0,0.2);
+  --glow-lg:      0 0 24px rgba(204,0,0,0.55), 0 0 60px rgba(100,0,0,0.3);
+  --glow-gold:    0 0 12px rgba(200,160,40,0.5);
+  --glow-arcane:  0 0 16px rgba(155,48,208,0.5), 0 0 32px rgba(100,20,160,0.25);
 }
 
 /* =========================
    BASE
 ========================= */
 
-*{box-sizing:border-box}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:
-    radial-gradient(circle at top, rgba(120,0,0,0.2), transparent 40%),
-    linear-gradient(180deg,#050505,#0a0a0a);
-  color:var(--text);
+body {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: var(--bg);
+  color: var(--text);
+  background-image:
+    /* radial blood glow top center */
+    radial-gradient(ellipse 80% 40% at 50% -5%, rgba(120,0,0,0.28) 0%, transparent 70%),
+    /* subtle arcane shimmer bottom right */
+    radial-gradient(ellipse 60% 30% at 90% 110%, rgba(80,0,110,0.12) 0%, transparent 65%),
+    /* overall dark base */
+    linear-gradient(180deg, #080408 0%, #050305 100%);
+
+  /* grain texture overlay */
+  position: relative;
+}
+
+/* Grain texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure content is above grain */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* =========================
    LAYOUT
 ========================= */
 
-.wrap{
-  max-width:1000px;
-  margin:0 auto;
-  padding:20px;
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+h1, h2, h3, h4 {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5em;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2.4rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.2rem; }
+
+p {
+  margin: 0 0 1em;
 }
 
 /* =========================
    HERO
 ========================= */
 
-.hero{
-  background:linear-gradient(180deg,#140000,#0a0a0a);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:22px;
-  margin-bottom:16px;
-  text-align:center;
-  position:relative;
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, #1a0010 0%, #0f0008 40%, #0a0005 100%);
+  border: 1px solid var(--line-bright);
+  border-radius: 20px;
+  padding: 44px 28px 36px;
+  margin-bottom: 20px;
+  text-align: center;
+
+  /* Inner shadow border glow */
+  box-shadow:
+    0 0 0 1px rgba(80,0,0,0.3),
+    inset 0 1px 0 rgba(255,80,80,0.06),
+    var(--glow-md);
 }
 
-.hero h1{
-  color:var(--primary);
-  font-size:2.4rem;
-  text-shadow:0 0 12px rgba(255,0,0,0.5);
+/* Zamorak symbol — large, ghostly */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    url("https://oldschool.runescape.wiki/images/Zamorak_symbol.png")
+    center / 260px no-repeat;
+  opacity: 0.04;
+  pointer-events: none;
+  filter: blur(1px);
+  mix-blend-mode: screen;
 }
 
-.hero p{
-  color:var(--muted);
+/* Blood drip bottom edge */
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--primary-dim) 20%,
+    var(--primary) 50%,
+    var(--primary-dim) 80%,
+    transparent 100%
+  );
+  animation: pulse-line 3s ease-in-out infinite;
 }
 
-/* faint zamorak symbol */
-.hero::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:url("https://oldschool.runescape.wiki/images/Zamorak_symbol.png") center/120px no-repeat;
-  opacity:0.03;
-  pointer-events:none;
+@keyframes pulse-line {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; box-shadow: 0 0 12px var(--primary); }
+}
+
+.hero h1 {
+  position: relative;
+  color: var(--primary-glow);
+  font-size: 2.6rem;
+  text-shadow:
+    0 0 10px rgba(255,30,30,0.7),
+    0 0 30px rgba(200,0,0,0.4),
+    0 0 60px rgba(150,0,0,0.2);
+  animation: flicker-text 8s ease-in-out infinite;
+}
+
+@keyframes flicker-text {
+  0%, 100% { text-shadow: 0 0 10px rgba(255,30,30,0.7), 0 0 30px rgba(200,0,0,0.4), 0 0 60px rgba(150,0,0,0.2); }
+  45%       { text-shadow: 0 0 12px rgba(255,30,30,0.9), 0 0 35px rgba(200,0,0,0.5), 0 0 70px rgba(150,0,0,0.25); }
+  47%       { text-shadow: 0 0 6px rgba(255,30,30,0.5), 0 0 18px rgba(200,0,0,0.3); }
+  49%       { text-shadow: 0 0 12px rgba(255,30,30,0.9), 0 0 35px rgba(200,0,0,0.5), 0 0 70px rgba(150,0,0,0.25); }
+}
+
+.hero p {
+  position: relative;
+  color: var(--muted);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 /* =========================
    CARDS
 ========================= */
 
-.card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:16px;
-  transition:0.2s;
+.card {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+
+  /* Corner sigil accent */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 0% 0%, rgba(100,0,0,0.08) 0%, transparent 60%);
 }
 
-.card:hover{
-  border-color:var(--primary);
+/* Thin left accent bar */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 16px; bottom: 16px; left: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--arcane-dim) 100%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.card:hover {
+  border-color: var(--line-bright);
+  box-shadow: var(--glow-sm);
+  transform: translateY(-2px);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 /* =========================
    NAV
 ========================= */
 
-nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:16px;
+nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
 }
 
-nav a, button{
-  background:var(--panel2);
-  color:var(--text);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:10px 14px;
-  text-decoration:none;
-  cursor:pointer;
-  font-weight:700;
-  transition:0.2s;
+nav a,
+button {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 18px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, color 0.2s, background 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
-nav a:hover, button:hover{
-  border-color:var(--primary);
-  box-shadow:0 0 8px rgba(255,0,0,0.3);
+/* Hover shimmer sweep */
+nav a::after,
+button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,40,40,0.06) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
 }
 
-/* primary buttons */
-button.primary,a.primary{
-  background:linear-gradient(180deg,#b30000,#660000);
-  color:white;
-  border-color:#400000;
+nav a:hover::after,
+button:hover::after {
+  transform: translateX(100%);
 }
 
-button.primary:hover,a.primary:hover{
-  background:var(--primary-glow);
-  box-shadow:0 0 10px rgba(255,0,0,0.6);
+nav a:hover,
+button:hover {
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: var(--glow-sm);
+}
+
+/* Primary variant */
+button.primary,
+a.primary {
+  background: linear-gradient(160deg, #aa0000 0%, #5c0000 100%);
+  border-color: #8b0000;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(180,0,0,0.3);
+}
+
+button.primary:hover,
+a.primary:hover {
+  background: linear-gradient(160deg, #dd0000 0%, #880000 100%);
+  box-shadow: var(--glow-md);
+  border-color: var(--primary-glow);
+}
+
+/* Gold / secondary variant */
+button.gold,
+a.gold {
+  background: linear-gradient(160deg, #5a3d00 0%, #2e1f00 100%);
+  border-color: var(--gold-dim);
+  color: var(--gold-glow);
+}
+
+button.gold:hover,
+a.gold:hover {
+  box-shadow: var(--glow-gold);
+  border-color: var(--gold);
 }
 
 /* =========================
    GRID
 ========================= */
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
 }
 
-@media (max-width:800px){
-  .grid{grid-template-columns:1fr}
+@media (max-width: 800px) {
+  .grid { grid-template-columns: 1fr; }
 }
 
 /* =========================
    FORMS
 ========================= */
 
-label{
-  display:block;
-  margin:10px 0 6px;
-  color:#d7dce6;
-  font-weight:700;
+label {
+  display: block;
+  margin: 12px 0 6px;
+  color: var(--text-bright);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-input,textarea{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  background:#0a0a0a;
-  color:var(--text);
-  transition:0.2s;
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(5,2,5,0.7);
+  color: var(--text-bright);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input:focus,textarea:focus{
-  outline:none;
-  border-color:var(--primary);
-  box-shadow:0 0 6px rgba(255,0,0,0.4);
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
 }
 
-textarea{
-  min-height:120px;
-  resize:vertical;
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 3px rgba(180,0,0,0.12),
+    var(--glow-sm);
+  background: rgba(15,4,10,0.9);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
 }
 
 /* =========================
    TEXT STATES
 ========================= */
 
-.muted{color:var(--muted)}
-.success{color:var(--green);font-weight:700}
-.error{color:var(--red);font-weight:700}
+.muted   { color: var(--muted); }
+.success { color: var(--green);  font-weight: 700; }
+.error   { color: var(--red);    font-weight: 700; }
+.gold-text { color: var(--gold); }
+.arcane-text {
+  color: var(--arcane-glow);
+  text-shadow: var(--glow-arcane);
+}
 
 /* =========================
    MESSAGE BOARD
 ========================= */
 
-.message{
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-  margin-top:10px;
-  background:#0f0f0f;
-  border-left:3px solid var(--primary);
+.message {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 14px 14px 18px;
+  margin-top: 12px;
+  background: linear-gradient(135deg, #0e0610 0%, #0a0408 100%);
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
 
-.message .top{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:8px;
-  color:#fff;
-  font-weight:700;
+.message::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--primary) 0%, #660000 100%);
+}
+
+.message:hover {
+  border-color: var(--line-bright);
+}
+
+.message .top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.message .top .timestamp {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.8rem;
 }
 
 /* =========================
    MEMBERS
 ========================= */
 
-.member{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  margin-top:10px;
-  background:#0f0f0f;
-  transition:0.2s;
+.member {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin-top: 12px;
+  background: linear-gradient(120deg, #0e0610 0%, #09050a 100%);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
-.member:hover{
-  border-color:var(--primary);
+.member:hover {
+  border-color: var(--line-bright);
+  box-shadow: var(--glow-sm);
+  transform: translateX(3px);
+}
+
+/* Rank badge */
+.member .rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  background: rgba(120,80,0,0.15);
+}
+
+/* =========================
+   BADGES / TAGS
+========================= */
+
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.badge-red {
+  background: rgba(150,0,0,0.25);
+  border: 1px solid rgba(200,0,0,0.35);
+  color: #ff6666;
+}
+
+.badge-gold {
+  background: rgba(120,80,0,0.2);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-glow);
+}
+
+.badge-arcane {
+  background: rgba(100,0,160,0.2);
+  border: 1px solid rgba(140,40,200,0.4);
+  color: var(--arcane-glow);
+}
+
+/* =========================
+   DIVIDERS
+========================= */
+
+hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--primary-dim) 20%,
+    rgba(150,0,0,0.5) 50%,
+    var(--primary-dim) 80%,
+    transparent 100%
+  );
+  margin: 24px 0;
+}
+
+/* Ornamental section divider */
+.divider-chaos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0;
+  color: var(--primary);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.divider-chaos::before,
+.divider-chaos::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-dim));
+}
+
+.divider-chaos::after {
+  background: linear-gradient(90deg, var(--primary-dim), transparent);
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary) 0%, var(--arcane-dim) 100%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--primary-glow); }
+
+/* =========================
+   SELECTION
+========================= */
+
+::selection {
+  background: rgba(180, 0, 0, 0.35);
+  color: #fff;
 }
 
 /* =========================
    UTIL
 ========================= */
 
-.hidden{display:none}
-.small{font-size:12px}
+.hidden { display: none; }
+.small  { font-size: 0.8rem; }
 
 /* =========================
-   SCROLLBAR
+   ANIMATIONS
 ========================= */
 
-::-webkit-scrollbar{
-  width:6px;
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-::-webkit-scrollbar-thumb{
-  background:var(--primary);
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: var(--glow-sm); }
+  50%       { box-shadow: var(--glow-md); }
 }
+
+/* Apply fade-up on cards for page load feel */
+.card {
+  animation: fade-up 0.4s ease both;
+}
+
+/* Stagger cards */
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+.card:nth-child(5) { animation-delay: 0.25s; }
