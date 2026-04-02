@@ -3,23 +3,56 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Pledge Faith to the Lord</title>
+  <title>Apply — Disciples of Zamorak</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <h1>Application</h1>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="board.html">Message Board</a>
-        <a href="apply.html">Apply</a>
-        <a href="members.html">Members</a>
-      </nav>
-    </div>
 
-    <section class="card">
-      <h2>Apply</h2>
+  <!-- ── HEADER ─────────────────────────── -->
+  <header class="site-header">
+    <div class="sigil"></div>
+    <div>
+      <div class="clan-name">Disciples of Zamorak</div>
+      <div class="clan-sub">Castle Wars Clan · Est. Gielinor</div>
+    </div>
+    <div class="header-right">
+      <a class="header-discord" href="https://discord.gg/" target="_blank">⚔ Discord</a>
+    </div>
+  </header>
+
+  <!-- ── NAV ────────────────────────────── -->
+  <nav class="site-nav">
+    <div class="nav-section-label">Navigation</div>
+
+    <a href="index.html">
+      <span class="nav-icon">🏰</span> Home
+    </a>
+
+    <a href="board.html">
+      <span class="nav-icon">📜</span> Message Board
+    </a>
+
+    <a href="members.html">
+      <span class="nav-icon">⚔</span> Members
+    </a>
+
+    <a href="apply.html" class="active">
+      <span class="nav-icon">🩸</span> Apply
+    </a>
+
+    <hr class="nav-divider">
+
+    <div class="nav-section-label">Admin</div>
+    <a href="admin.html">
+      <span class="nav-icon">🔱</span> Admin Panel
+    </a>
+  </nav>
+
+  <!-- ── MAIN ───────────────────────── -->
+  <main class="site-main">
+
+    <div class="card">
+      <h2>Join the Disciples</h2>
 
       <label for="applyRsn">RSN</label>
       <input id="applyRsn" maxlength="24" placeholder="RuneScape name">
@@ -33,19 +66,22 @@
       <label for="applyReason">Why do you want to join?</label>
       <textarea id="applyReason" maxlength="1000" placeholder="Tell us why"></textarea>
 
-      <input id="applyWebsite" class="hidden" tabindex="-1" autocomplete="off" placeholder="Leave blank">
+      <!-- Honeypot -->
+      <input id="applyWebsite" class="hidden" tabindex="-1" autocomplete="off">
 
       <div style="margin-top:12px">
         <button class="primary" id="applyBtn">Submit Application</button>
       </div>
 
       <div id="applyStatus" style="margin-top:12px"></div>
-    </section>
-  </div>
+    </div>
+
+  </main>
 
   <script src="clan.js"></script>
   <script>
     document.getElementById("applyBtn").addEventListener("click", submitClanApplication);
   </script>
+
 </body>
 </html>
