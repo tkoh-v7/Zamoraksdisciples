@@ -3,40 +3,163 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Disciples of Zamorak</title>
+  <title>Disciples of Zamorak — Castle Wars Clan</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <h1>Disciples of Zamorak</h1>
-      <p>Clan hub for members, applicants, and anybody looking to join the crew.</p>
 
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="board.html">Message Board</a>
-        <a href="apply.html">Apply</a>
-        <a href="members.html">Members</a>
-        <a class="primary" href="https://discord.gg/" target="_blank">Join Discord</a>
-      </nav>
+  <!-- ── TOP HEADER ─────────────────────────── -->
+  <header class="site-header">
+    <div class="sigil"></div>
+    <div>
+      <div class="clan-name">Disciples of Zamorak</div>
+      <div class="clan-sub">Castle Wars Clan · Est. Gielinor</div>
+    </div>
+    <div class="header-right">
+      <a class="header-discord" href="https://discord.gg/" target="_blank">⚔ Discord</a>
+    </div>
+  </header>
+
+  <!-- ── SIDE NAV ────────────────────────────── -->
+  <nav class="site-nav">
+    <div class="nav-section-label">Navigation</div>
+    <a href="index.html" class="active">
+      <span class="nav-icon">🏰</span> Home
+    </a>
+    <a href="board.html">
+      <span class="nav-icon">📜</span> Message Board
+    </a>
+    <a href="members.html">
+      <span class="nav-icon">⚔</span> Members
+    </a>
+    <a href="apply.html">
+      <span class="nav-icon">🩸</span> Apply
+    </a>
+    <hr class="nav-divider">
+    <div class="nav-section-label">Admin</div>
+    <a href="admin.html">
+      <span class="nav-icon">🔱</span> Admin Panel
+    </a>
+  </nav>
+
+  <!-- ── MAIN CONTENT ───────────────────────── -->
+  <main class="site-main">
+
+    <!-- Welcome banner -->
+    <div class="welcome-banner">
+      <h2>Welcome, Disciple.</h2>
+      <p>The official hub for the Disciples of Zamorak Castle Wars clan. Find your brothers, rally for war, and pledge your blade to the Mahjarrat's cause.</p>
     </div>
 
-    <div class="grid">
+    <!-- Quick links -->
+    <div class="card-title">Quick Navigation</div>
+    <div class="quick-links" style="margin-bottom:24px;">
+      <a class="quick-link-tile highlight" href="board.html">
+        <span class="tile-icon">📜</span>
+        Message Board
+      </a>
+      <a class="quick-link-tile" href="members.html">
+        <span class="tile-icon">⚔</span>
+        Members
+      </a>
+      <a class="quick-link-tile" href="apply.html">
+        <span class="tile-icon">🩸</span>
+        Apply to Join
+      </a>
+      <a class="quick-link-tile" href="https://discord.gg/" target="_blank">
+        <span class="tile-icon">💬</span>
+        Discord
+      </a>
+      <a class="quick-link-tile" href="admin.html">
+        <span class="tile-icon">🔱</span>
+        Admin Panel
+      </a>
+    </div>
+
+    <!-- Two-col content grid -->
+    <div class="home-grid">
+
       <section class="card">
-        <h2>Welcome</h2>
-        <p>This is the official Castle Wars clan hub.</p>
+        <div class="card-title">About the Clan</div>
+        <p style="color:var(--text-dim); line-height:1.7;">
+          We are the <strong style="color:var(--primary);">Disciples of Zamorak</strong> — a Castle Wars clan united under the banner of the Lord of Chaos. We run organised Castle Wars sessions, coordinate wars, and rank our members through dedication and service to Zamorak.
+        </p>
+        <div style="margin-top:14px;">
+          <a class="btn btn-primary" href="apply.html">Pledge Your Faith →</a>
+        </div>
       </section>
 
       <section class="card">
-        <h2>Quick Links</h2>
-        <p><a href="board.html">Message Board</a></p>
-        <p><a href="apply.html">Apply</a></p>
-        <p><a href="members.html">Members</a></p>
+        <div class="card-title">Upcoming Events</div>
+        <div id="homeEvents">
+          <p class="muted small">Loading events...</p>
+        </div>
+        <div style="margin-top:12px;">
+          <a class="btn" href="admin.html" style="font-size:0.65rem;">View All Events →</a>
+        </div>
       </section>
+
     </div>
-  </div>
+
+    <!-- Recent messages preview -->
+    <section class="card" style="margin-top:0;">
+      <div class="card-title">Recent Board Activity</div>
+      <div id="homeMessages">
+        <p class="muted small">Loading messages...</p>
+      </div>
+      <div style="margin-top:12px;">
+        <a class="btn" href="board.html">View Full Board →</a>
+      </div>
+    </section>
+
+  </main>
 
   <script src="clan.js"></script>
+  <script>
+    // Load preview of messages (3 most recent)
+    async function loadHomeMessages() {
+      const el = document.getElementById('homeMessages');
+      try {
+        const items = await api('/api/clan/messages');
+        if (!items.length) { el.innerHTML = "<p class='muted small'>No messages yet.</p>"; return; }
+        el.innerHTML = items.slice(0, 3).map(item => `
+          <div class="message">
+            <div class="top">
+              <span class="author">${escapeHtml(item.name)}</span>
+              <span class="timestamp">${fmt(item.ts)}</span>
+            </div>
+            <div class="body">${escapeHtml(item.message)}</div>
+          </div>
+        `).join('');
+      } catch(err) {
+        el.innerHTML = `<p class="error">${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    // Load upcoming events preview
+    async function loadHomeEvents() {
+      const el = document.getElementById('homeEvents');
+      try {
+        const events = JSON.parse(localStorage.getItem('doz_events') || '[]');
+        if (!events.length) { el.innerHTML = "<p class='muted small'>No events scheduled.</p>"; return; }
+        const upcoming = events.slice(0, 2);
+        el.innerHTML = upcoming.map(ev => `
+          <div class="event-card">
+            <div class="event-title">${escapeHtml(ev.title)}</div>
+            <div class="event-meta">
+              <span class="event-meta-item"><span class="icon">🌍</span> ${escapeHtml(ev.location)}</span>
+              <span class="event-world">W${escapeHtml(String(ev.world))}</span>
+              <span class="event-meta-item"><span class="icon">🕐</span> ${escapeHtml(ev.time)}</span>
+            </div>
+          </div>
+        `).join('');
+      } catch {
+        el.innerHTML = "<p class='muted small'>Could not load events.</p>";
+      }
+    }
+
+    loadHomeMessages();
+    loadHomeEvents();
+  </script>
 </body>
 </html>
