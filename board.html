@@ -3,48 +3,71 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>DoZ Message Board</title>
+  <title>Message Board — Disciples of Zamorak</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="hero">
-      <h1>DoZ Message Board</h1>
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="board.html">Message Board</a>
-        <a href="apply.html">Apply</a>
-        <a href="members.html">Members</a>
-      </nav>
+
+  <header class="site-header">
+    <div class="sigil"></div>
+    <div>
+      <div class="clan-name">Disciples of Zamorak</div>
+      <div class="clan-sub">Castle Wars Clan · Est. Gielinor</div>
+    </div>
+    <div class="header-right">
+      <a class="header-discord" href="https://discord.gg/" target="_blank">⚔ Discord</a>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <div class="nav-section-label">Navigation</div>
+    <a href="index.html"><span class="nav-icon">🏰</span> Home</a>
+    <a href="board.html" class="active"><span class="nav-icon">📜</span> Message Board</a>
+    <a href="members.html"><span class="nav-icon">⚔</span> Members</a>
+    <a href="apply.html"><span class="nav-icon">🩸</span> Apply</a>
+    <hr class="nav-divider">
+    <div class="nav-section-label">Admin</div>
+    <a href="admin.html"><span class="nav-icon">🔱</span> Admin Panel</a>
+  </nav>
+
+  <main class="site-main">
+    <div class="page-header">
+      <h1>Message <span>Board</span></h1>
+      <p>Leave word for your brothers. All disciples may post.</p>
     </div>
 
-    <section class="card">
-      <h2>Post Message</h2>
+    <div class="grid-2" style="align-items:start;">
 
-      <label for="boardName">Name</label>
-      <input id="boardName" maxlength="24" placeholder="Your name">
+      <!-- Post form -->
+      <section class="card">
+        <div class="card-title">Post a Message</div>
+        <div class="form-group">
+          <label for="boardName">Your Name / RSN</label>
+          <input type="text" id="boardName" maxlength="24" placeholder="RuneScape name">
+        </div>
+        <div class="form-group">
+          <label for="boardMessage">Message</label>
+          <textarea id="boardMessage" maxlength="500" placeholder="Write your message here..."></textarea>
+        </div>
+        <!-- Honeypot -->
+        <input id="boardWebsite" class="hidden" tabindex="-1" autocomplete="off" placeholder="Leave blank">
+        <button class="btn btn-primary" id="postBtn" onclick="submitClanMessage()">Post Message</button>
+        <div id="boardStatus"></div>
+      </section>
 
-      <label for="boardMessage">Message</label>
-      <textarea id="boardMessage" maxlength="500" placeholder="Write your message"></textarea>
+      <!-- Feed -->
+      <section>
+        <div class="card-title" style="margin-bottom:10px;">Messages</div>
+        <div id="boardFeed">
+          <p class="muted small">Loading messages...</p>
+        </div>
+      </section>
 
-      <input id="boardWebsite" class="hidden" tabindex="-1" autocomplete="off" placeholder="Leave blank">
-
-      <div style="margin-top:12px">
-        <button class="primary" id="postBtn">Post Message</button>
-      </div>
-
-      <div id="boardStatus" style="margin-top:12px"></div>
-    </section>
-
-    <section class="card">
-      <h2>Messages</h2>
-      <div id="boardFeed"></div>
-    </section>
-  </div>
+    </div>
+  </main>
 
   <script src="clan.js"></script>
   <script>
-    document.getElementById("postBtn").addEventListener("click", submitClanMessage);
     loadClanMessages();
   </script>
 </body>
