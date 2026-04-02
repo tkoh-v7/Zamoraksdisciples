@@ -42,12 +42,16 @@
       <section class="card" style="max-width:400px;">
         <div class="card-title">Authenticate</div>
         <div class="form-group">
-          <label for="loginPass">Admin Password</label>
-          <input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+          <label for="loginPass">Admin Key</label>
+          <input type="password" id="loginPass" placeholder="Enter your admin key"
+                 onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <button class="btn btn-primary" onclick="doLogin()">🔱 Enter the Sanctum</button>
         <div id="loginStatus"></div>
-        <p class="muted small" style="margin-top:14px;">Default password: <span class="mono">zamorak</span> — change in the JS source.</p>
+        <p class="muted small" style="margin-top:14px;">
+          The admin key is your <span class="mono">ADMIN_KEY</span> Cloudflare Worker secret.
+          It is never stored in this page's source.
+        </p>
       </section>
     </div>
 
@@ -58,43 +62,32 @@
         <p>Manage applications, members, and clan events.</p>
       </div>
 
-      <!-- Tab bar -->
       <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('applications')">🩸 Applications</button>
-        <button class="tab-btn" onclick="switchTab('events')">⚔ Events</button>
-        <button class="tab-btn" onclick="switchTab('members')">👥 Members</button>
+        <button class="tab-btn active" onclick="switchTab(event,'applications')">🩸 Applications</button>
+        <button class="tab-btn" onclick="switchTab(event,'events')">⚔ Events</button>
+        <button class="tab-btn" onclick="switchTab(event,'members')">👥 Members</button>
       </div>
 
       <!-- ── TAB: APPLICATIONS ─────────────── -->
       <div class="tab-pane active" id="tab-applications">
-
         <div class="flex-between mb-16">
-          <div class="card-title" style="margin-bottom:0;">Pending Applications</div>
+          <div class="card-title" style="margin-bottom:0;">Applications</div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span class="mono small muted">Filter:</span>
             <select id="appFilter" onchange="renderApplications()" style="width:auto;padding:6px 10px;font-size:0.8rem;">
-              <option value="all">All</option>
               <option value="pending" selected>Pending</option>
               <option value="accepted">Accepted</option>
               <option value="declined">Declined</option>
+              <option value="all">All</option>
             </select>
           </div>
         </div>
-
-        <!-- API-sourced applications -->
-        <div id="appsFeed">
-          <p class="muted small">Loading applications...</p>
-        </div>
-
-        <!-- Fallback: local demo applications (shown when API returns none) -->
-        <div id="appsLocal" class="hidden"></div>
+        <div id="appsFeed"><p class="muted small">Loading applications...</p></div>
       </div>
 
       <!-- ── TAB: EVENTS ───────────────────── -->
       <div class="tab-pane" id="tab-events">
         <div class="grid-2" style="align-items:start;gap:20px;">
-
-          <!-- Create event form -->
           <section class="card">
             <div class="card-title">Post New Event</div>
             <div class="form-group">
@@ -126,24 +119,17 @@
             <button class="btn btn-gold" onclick="postEvent()">⚔ Post Event</button>
             <div id="evStatus"></div>
           </section>
-
-          <!-- Events list -->
           <div>
             <div class="card-title" style="margin-bottom:10px;">Scheduled Events</div>
-            <div id="eventsList">
-              <p class="muted small">No events posted yet.</p>
-            </div>
+            <div id="eventsList"><p class="muted small">No events posted yet.</p></div>
           </div>
-
         </div>
       </div>
 
       <!-- ── TAB: MEMBERS ──────────────────── -->
       <div class="tab-pane" id="tab-members">
         <div class="card-title mb-16">Member Roster</div>
-        <div id="adminMembersList">
-          <p class="muted small">Loading members...</p>
-        </div>
+        <div id="adminMembersList"><p class="muted small">Loading members...</p></div>
       </div>
 
     </div><!-- /adminPanel -->
@@ -152,28 +138,59 @@
 
   <script src="clan.js"></script>
   <script>
-
-    // ── CONFIG ────────────────────────────────────
-    // Change this password — it's a simple client-side gate only.
-    // For real security, move auth to your Cloudflare Worker.
-    const ADMIN_PASSWORD = 'zamorak';
+    // ── AUTH ──────────────────────────────────────────────────────────────
+    // The admin key is your Cloudflare ADMIN_KEY secret. It's sent as an
+    // x-admin-key request header. It is NEVER hardcoded in this file —
+    // only held in sessionStorage for the lifetime of the browser tab.
 
     const ROLE_HIERARCHY = ['Founder', 'Admin', 'Leader', 'Disciple', 'NA'];
 
-    // ── AUTH ──────────────────────────────────────
-    function doLogin() {
-      const pass  = document.getElementById('loginPass').value;
-      const status = document.getElementById('loginStatus');
-      if (pass === ADMIN_PASSWORD) {
-        sessionStorage.setItem('doz_admin', '1');
+    function getAdminKey() {
+      return sessionStorage.getItem('doz_admin_key') || '';
+    }
+
+    async function doLogin() {
+      const keyInput = document.getElementById('loginPass');
+      const status   = document.getElementById('loginStatus');
+      const key      = keyInput.value.trim();
+
+      if (!key) {
+        status.innerHTML = `<div class="status-msg error">Please enter your admin key.</div>`;
+        return;
+      }
+
+      status.innerHTML = `<div class="status-msg">Verifying with server...</div>`;
+
+      try {
+        // Validate the key by hitting a protected Worker endpoint.
+        // A 200 means the key is correct; 401 means it's wrong.
+        const res = await fetch(`${API_BASE}/api/clan/apps`, {
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': key }
+        });
+
+        if (res.status === 401) {
+          status.innerHTML = `<div class="status-msg error">Invalid key. Zamorak judges you.</div>`;
+          return;
+        }
+
+        if (!res.ok) {
+          status.innerHTML = `<div class="status-msg error">Server error (${res.status}). Try again.</div>`;
+          return;
+        }
+
+        // Key verified — keep it in sessionStorage only (cleared on tab close)
+        sessionStorage.setItem('doz_admin_key', key);
+        keyInput.value = '';
+        status.innerHTML = '';
         showAdminPanel();
-      } else {
-        status.innerHTML = `<div class="status-msg error">Incorrect password. Zamorak judges you.</div>`;
+
+      } catch (err) {
+        status.innerHTML = `<div class="status-msg error">Could not reach server: ${escapeHtml(err.message)}</div>`;
       }
     }
 
     function adminLogout() {
-      sessionStorage.removeItem('doz_admin');
+      sessionStorage.removeItem('doz_admin_key');
       document.getElementById('adminPanel').classList.add('hidden');
       document.getElementById('loginGate').classList.remove('hidden');
       document.getElementById('logoutBtn').style.display = 'none';
@@ -184,34 +201,50 @@
       document.getElementById('loginGate').classList.add('hidden');
       document.getElementById('adminPanel').classList.remove('hidden');
       document.getElementById('logoutBtn').style.display = '';
-      document.getElementById('adminRoleLabel').textContent = '🔱 Logged in as Admin';
+      document.getElementById('adminRoleLabel').textContent = '🔱 Admin';
       loadApplications();
       loadEvents();
       loadAdminMembers();
     }
 
-    // Auto-login if session exists
+    // Auto-resume if the key is already in sessionStorage from this tab
     window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('doz_admin')) showAdminPanel();
+      if (getAdminKey()) showAdminPanel();
     });
 
-    // ── TABS ──────────────────────────────────────
-    function switchTab(name) {
+    // Authenticated fetch wrapper — attaches x-admin-key to every request
+    async function adminFetch(path, options = {}) {
+      const res = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': getAdminKey(),
+          ...(options.headers || {})
+        }
+      });
+      let data = null;
+      try { data = await res.json(); } catch { data = null; }
+      if (!res.ok) throw new Error(data?.error || `Request failed (${res.status})`);
+      return data;
+    }
+
+    // ── TABS ──────────────────────────────────────────────────────────────
+    function switchTab(event, name) {
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('tab-' + name).classList.add('active');
       event.target.classList.add('active');
     }
 
-    // ── APPLICATIONS ─────────────────────────────
-
-    // Local storage key for application status overrides
+    // ── APPLICATIONS ──────────────────────────────────────────────────────
+    // Local overrides track what the admin has done this session so the UI
+    // stays consistent without needing to re-fetch after every action.
     const APP_STATUS_KEY = 'doz_app_statuses';
     const APP_ROLES_KEY  = 'doz_app_roles';
 
     function getAppStatuses() { return JSON.parse(localStorage.getItem(APP_STATUS_KEY) || '{}'); }
-    function saveAppStatus(id, status) {
-      const s = getAppStatuses(); s[id] = status;
+    function saveAppStatus(id, st) {
+      const s = getAppStatuses(); s[id] = st;
       localStorage.setItem(APP_STATUS_KEY, JSON.stringify(s));
     }
     function getAppRoles() { return JSON.parse(localStorage.getItem(APP_ROLES_KEY) || '{}'); }
@@ -224,93 +257,125 @@
 
     async function loadApplications() {
       const el = document.getElementById('appsFeed');
+      el.innerHTML = "<p class='muted small'>Loading...</p>";
       try {
-        const items = await api('/api/clan/applications');
-        allApplications = items;
+        // Worker: GET /api/clan/apps  (x-admin-key required)
+        const items = await adminFetch('/api/clan/apps');
+        allApplications = Array.isArray(items) ? items : [];
         renderApplications();
-      } catch(err) {
-        // API might not have applications endpoint yet — show message
-        el.innerHTML = `<div class="status-msg error">
-          Could not load applications from API: ${escapeHtml(err.message)}<br>
-          <span class="muted small">Add a <span class="mono">/api/clan/applications</span> endpoint to your Worker, or manage applications below.</span>
-        </div>`;
-        // Show local demo section
-        document.getElementById('appsLocal').classList.remove('hidden');
-        renderLocalDemo();
+      } catch (err) {
+        el.innerHTML = `<div class="status-msg error">Could not load: ${escapeHtml(err.message)}</div>`;
       }
     }
 
     function renderApplications() {
-      const el = document.getElementById('appsFeed');
-      if (!allApplications.length) { el.innerHTML = "<p class='muted small'>No applications found via API.</p>"; return; }
-
-      const filter = document.getElementById('appFilter').value;
+      const el       = document.getElementById('appsFeed');
+      const filter   = document.getElementById('appFilter').value;
       const statuses = getAppStatuses();
-      const roles = getAppRoles();
+      const roles    = getAppRoles();
+
+      if (!allApplications.length) {
+        el.innerHTML = "<p class='muted small'>No applications found.</p>";
+        return;
+      }
 
       const filtered = allApplications.filter(a => {
         const st = statuses[a.id] || 'pending';
         return filter === 'all' || st === filter;
       });
 
-      if (!filtered.length) { el.innerHTML = `<p class='muted small'>No ${filter} applications.</p>`; return; }
+      if (!filtered.length) {
+        el.innerHTML = `<p class='muted small'>No ${filter} applications.</p>`;
+        return;
+      }
 
       el.innerHTML = filtered.map(app => renderAppCard(app, statuses, roles)).join('');
     }
 
     function renderAppCard(app, statuses, roles) {
-      const id = app.id || app.rsn;
-      const st = statuses[id] || 'pending';
+      const id   = app.id;
+      const st   = statuses[id] || 'pending';
       const role = roles[id] || 'Disciple';
+
+      const roleOpts = ROLE_HIERARCHY.map(r =>
+        `<option value="${r}" ${r === role ? 'selected' : ''}>${r}</option>`
+      ).join('');
+
+      const actions = st === 'pending' ? `
+        <div class="application-actions">
+          <span class="mono small muted">Assign role:</span>
+          <select id="roleSelect-${escapeHtml(id)}" style="width:auto;padding:6px 10px;font-size:0.8rem;">
+            ${roleOpts}
+          </select>
+          <button class="btn btn-success btn-sm" onclick="acceptApp('${escapeHtml(id)}')">✓ Accept</button>
+          <button class="btn btn-danger btn-sm" onclick="declineApp('${escapeHtml(id)}')">✕ Decline</button>
+        </div>
+      ` : `
+        <div class="application-actions">
+          ${st === 'accepted'
+            ? `<span class="role-badge ${getRoleClass(roles[id] || 'Disciple')}">${escapeHtml(roles[id] || 'Disciple')}</span>`
+            : ''}
+          <button class="btn btn-sm" onclick="resetApp('${escapeHtml(id)}')">↩ Reset</button>
+        </div>
+      `;
 
       return `
         <div class="application-card ${st}" id="appcard-${escapeHtml(id)}">
           <div class="application-header">
             <div>
-              <div class="application-rsn">${escapeHtml(app.rsn || app.name || 'Unknown')}</div>
+              <div class="application-rsn">${escapeHtml(app.rsn || 'Unknown')}</div>
               <div class="application-meta">
-                Combat: ${escapeHtml(String(app.combat || '?'))} &nbsp;·&nbsp;
-                Discord: ${escapeHtml(app.discord || 'N/A')} &nbsp;·&nbsp;
-                ${fmt(app.ts || app.timestamp || Date.now())}
+                Combat: ${escapeHtml(String(app.combat || '?'))}
+                &nbsp;·&nbsp;Discord: ${escapeHtml(app.discord || 'N/A')}
+                &nbsp;·&nbsp;${fmt(app.ts || Date.now())}
               </div>
             </div>
-            <span class="role-badge ${st === 'accepted' ? 'role-disciple' : st === 'declined' ? 'role-na' : 'role-leader'}">${st.toUpperCase()}</span>
+            <span class="role-badge ${
+              st === 'accepted' ? 'role-disciple' :
+              st === 'declined' ? 'role-na' : 'role-leader'
+            }">${st.toUpperCase()}</span>
           </div>
           ${app.reason ? `<div class="application-reason">${escapeHtml(app.reason)}</div>` : ''}
-          ${st === 'pending' ? `
-            <div class="application-actions">
-              <span class="mono small muted">Assign role:</span>
-              <select id="roleSelect-${escapeHtml(id)}" style="width:auto;padding:6px 10px;font-size:0.8rem;">
-                ${ROLE_HIERARCHY.map(r => `<option value="${r}" ${r === role ? 'selected' : ''}>${r}</option>`).join('')}
-              </select>
-              <button class="btn btn-success btn-sm" onclick="acceptApp('${escapeHtml(id)}')">✓ Accept</button>
-              <button class="btn btn-danger btn-sm" onclick="declineApp('${escapeHtml(id)}')">✕ Decline</button>
-            </div>
-          ` : `
-            <div class="application-actions">
-              ${st === 'accepted' ? `<span class="role-badge ${getRoleClass(roles[id] || 'Disciple')}">${escapeHtml(roles[id] || 'Disciple')}</span>` : ''}
-              <button class="btn btn-sm" onclick="resetApp('${escapeHtml(id)}')">↩ Reset</button>
-            </div>
-          `}
+          ${actions}
         </div>
       `;
     }
 
-    function acceptApp(id) {
+    async function acceptApp(id) {
       const roleEl = document.getElementById('roleSelect-' + id);
-      const role = roleEl ? roleEl.value : 'Disciple';
-      saveAppStatus(id, 'accepted');
-      saveAppRole(id, role);
-      renderApplications();
+      const role   = roleEl ? roleEl.value : 'Disciple';
+      try {
+        // Worker: POST /api/clan/app/accept  { id, role }
+        // NOTE: the Worker currently ignores role — see worker patch below.
+        await adminFetch('/api/clan/app/accept', {
+          method: 'POST',
+          body: JSON.stringify({ id, role })
+        });
+        saveAppStatus(id, 'accepted');
+        saveAppRole(id, role);
+        renderApplications();
+      } catch (err) {
+        alert('Accept failed: ' + err.message);
+      }
     }
 
-    function declineApp(id) {
-      saveAppStatus(id, 'declined');
-      renderApplications();
+    async function declineApp(id) {
+      try {
+        // Worker: POST /api/clan/app/reject  { id }
+        await adminFetch('/api/clan/app/reject', {
+          method: 'POST',
+          body: JSON.stringify({ id })
+        });
+        saveAppStatus(id, 'declined');
+        renderApplications();
+      } catch (err) {
+        alert('Decline failed: ' + err.message);
+      }
     }
 
     function resetApp(id) {
-      const s = getAppStatuses(); delete s[id];
+      const s = getAppStatuses();
+      delete s[id];
       localStorage.setItem(APP_STATUS_KEY, JSON.stringify(s));
       renderApplications();
     }
@@ -320,34 +385,15 @@
       return map[role] || 'role-disciple';
     }
 
-    // Demo local applications (for testing when API isn't wired up yet)
-    const DEMO_APPS = [
-      { id: 'demo1', rsn: 'ZammySlayer99', combat: 124, discord: 'slayer#1234', reason: "Been playing Castle Wars since 2008. Huge Zamorakian. Looking for a serious clan to run wars with.", ts: Date.now() - 86400000 },
-      { id: 'demo2', rsn: 'RedCapePride',  combat: 111, discord: '', reason: "Friend referred me. Love CW and want a community to play with regularly.", ts: Date.now() - 3600000 * 5 },
-    ];
-
-    function renderLocalDemo() {
-      const el = document.getElementById('appsLocal');
-      const statuses = getAppStatuses();
-      const roles = getAppRoles();
-      el.innerHTML = `
-        <div class="card-title" style="margin-top:16px;">Demo Applications (local)</div>
-        ${DEMO_APPS.map(app => renderAppCard(app, statuses, roles)).join('')}
-      `;
-    }
-
-    // ── EVENTS ───────────────────────────────────
+    // ── EVENTS (localStorage — no Worker endpoint needed) ─────────────────
     const EVENTS_KEY = 'doz_events';
-
-    function getEvents() { return JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]'); }
+    function getEvents()        { return JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]'); }
     function saveEvents(events) { localStorage.setItem(EVENTS_KEY, JSON.stringify(events)); }
 
-    function loadEvents() {
-      renderEvents();
-    }
+    function loadEvents() { renderEvents(); }
 
     function renderEvents() {
-      const el = document.getElementById('eventsList');
+      const el     = document.getElementById('eventsList');
       const events = getEvents();
       if (!events.length) { el.innerHTML = "<p class='muted small'>No events posted yet.</p>"; return; }
       el.innerHTML = events.map((ev, i) => `
@@ -377,7 +423,7 @@
       const status   = document.getElementById('evStatus');
 
       if (!title || !world || !time || !location) {
-        status.innerHTML = `<div class="status-msg error">Please fill in Title, World, Time, and Location.</div>`;
+        status.innerHTML = `<div class="status-msg error">Title, World, Time, and Location are required.</div>`;
         return;
       }
 
@@ -385,12 +431,9 @@
       events.unshift({ title, world, time, location, date, notes, postedAt: Date.now() });
       saveEvents(events);
 
-      document.getElementById('evTitle').value    = '';
-      document.getElementById('evWorld').value    = '';
-      document.getElementById('evTime').value     = '';
-      document.getElementById('evLocation').value = '';
-      document.getElementById('evDate').value     = '';
-      document.getElementById('evNotes').value    = '';
+      ['evTitle','evWorld','evTime','evLocation','evDate','evNotes'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
 
       status.innerHTML = `<div class="status-msg success">⚔ Event posted.</div>`;
       setTimeout(() => status.innerHTML = '', 3000);
@@ -404,7 +447,7 @@
       renderEvents();
     }
 
-    // ── ADMIN MEMBERS VIEW ────────────────────────
+    // ── ADMIN MEMBERS VIEW ────────────────────────────────────────────────
     async function loadAdminMembers() {
       const el = document.getElementById('adminMembersList');
       try {
@@ -423,11 +466,10 @@
             </div>
           `;
         }).join('');
-      } catch(err) {
+      } catch (err) {
         el.innerHTML = `<p class="error">${escapeHtml(err.message)}</p>`;
       }
     }
-
   </script>
 </body>
 </html>
