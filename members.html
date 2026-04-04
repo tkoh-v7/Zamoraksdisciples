@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Members — Disciples of Zamorak</title>
+  <title>Members - Disciples of Zamorak</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,44 +12,43 @@
     <div class="sigil"></div>
     <div>
       <div class="clan-name">Disciples of Zamorak</div>
-      <div class="clan-sub">Castle Wars Clan · Est. Gielinor</div>
+      <div class="clan-sub">Castle Wars Clan - Est. Gielinor</div>
     </div>
     <div class="header-right">
-      <a class="header-discord" href="https://discord.gg/" target="_blank">⚔ Discord</a>
+      <a class="header-discord" href="https://discord.gg/EBqS3dxGbn" target="_blank">Discord</a>
     </div>
   </header>
 
   <nav class="site-nav">
     <div class="nav-section-label">Navigation</div>
-    <a href="index.html"><span class="nav-icon">🏰</span> Home</a>
-    <a href="board.html"><span class="nav-icon">📜</span> Message Board</a>
-    <a href="members.html" class="active"><span class="nav-icon">⚔</span> Members</a>
-    <a href="apply.html"><span class="nav-icon">🩸</span> Apply</a>
+    <a href="index.html"><span class="nav-icon">Home</span></a>
+    <a href="board.html"><span class="nav-icon">Board</span></a>
+    <a href="members.html" class="active"><span class="nav-icon">Members</span></a>
+    <a href="apply.html"><span class="nav-icon">Apply</span></a>
     <hr class="nav-divider">
     <div class="nav-section-label">Admin</div>
-    <a href="admin.html"><span class="nav-icon">🔱</span> Admin Panel</a>
+    <a href="admin.html"><span class="nav-icon">Admin</span></a>
   </nav>
 
   <main class="site-main">
     <div class="page-header">
       <h1>The <span>Disciples</span></h1>
-      <p>Those who have pledged their faith and earned their place under Zamorak's banner.</p>
+      <p>Accepted members under the leadership of <strong>Tkoh V7</strong>.</p>
     </div>
 
-    <!-- Stat row -->
     <div class="stat-row" id="memberStats">
       <div class="stat-badge">
-        <span class="val" id="statTotal">—</span>
-        <span class="lbl">Total Members</span>
+        <span class="val" id="statTotal">-</span>
+        <span class="lbl">Accepted</span>
       </div>
       <div class="stat-badge">
-        <span class="val" id="statAdmins">—</span>
+        <span class="val" id="statLeadership">Tkoh V7</span>
         <span class="lbl">Leadership</span>
       </div>
     </div>
 
     <section class="card">
-      <div class="card-title">Members List</div>
+      <div class="card-title">Accepted Members</div>
       <div id="membersList">
         <p class="muted small">Loading members...</p>
       </div>
@@ -58,49 +57,51 @@
 
   <script src="clan.js"></script>
   <script>
-    // Override the default loadClanMembers to use the richer render
     async function loadMembersPage() {
-      const el = document.getElementById('membersList');
+      const membersEl = document.getElementById("membersList");
       try {
-        const items = await api('/api/clan/members');
+        const items = await api("/api/clan/members");
+
         if (!items.length) {
-          el.innerHTML = "<p class='muted small'>No members added yet.</p>";
-          document.getElementById('statTotal').textContent = '0';
-          document.getElementById('statAdmins').textContent = '0';
+          membersEl.innerHTML = "<p class='muted small'>No accepted members yet.</p>";
+          document.getElementById("statTotal").textContent = "0";
           return;
         }
 
-        const roleOrder = { 'Founder': 0, 'Admin': 1, 'Leader': 2, 'Disciple': 3, 'NA': 4 };
+        const roleOrder = { Founder: 0, Admin: 1, Leader: 2, Disciple: 3, NA: 4 };
         items.sort((a, b) => (roleOrder[a.role] ?? 5) - (roleOrder[b.role] ?? 5));
+        document.getElementById("statTotal").textContent = items.length;
 
-        const leadership = items.filter(m => ['Founder','Admin','Leader'].includes(m.role));
-        document.getElementById('statTotal').textContent = items.length;
-        document.getElementById('statAdmins').textContent = leadership.length;
-
-        el.innerHTML = items.map(item => {
-          const initial = (item.name || '?')[0].toUpperCase();
+        membersEl.innerHTML = items.map((item) => {
+          const initial = (item.name || "?")[0].toUpperCase();
           const roleClass = getRoleClass(item.role);
           return `
             <div class="member">
               <div class="member-avatar">${initial}</div>
               <div class="member-info">
-                <div class="member-name">${escapeHtml(item.name || '')}</div>
-                <div class="member-joined mono small" style="color:var(--text-faint);">${escapeHtml(item.discord || '')}</div>
+                <div class="member-name">${escapeHtml(item.name || "")}</div>
+                <div class="member-joined mono small" style="color:var(--text-faint);">${escapeHtml(item.joinedAt ? fmt(item.joinedAt) : "Accepted member")}</div>
               </div>
               <div>
-                <span class="role-badge ${roleClass}">${escapeHtml(item.role || 'Disciple')}</span>
+                <span class="role-badge ${roleClass}">${escapeHtml(item.role || "Disciple")}</span>
               </div>
             </div>
           `;
-        }).join('');
-      } catch(err) {
-        el.innerHTML = `<p class="error">${escapeHtml(err.message)}</p>`;
+        }).join("");
+      } catch (err) {
+        membersEl.innerHTML = `<p class="error">${escapeHtml(err.message)}</p>`;
       }
     }
 
     function getRoleClass(role) {
-      const map = { 'Founder': 'role-founder', 'Admin': 'role-admin', 'Leader': 'role-leader', 'Disciple': 'role-disciple', 'NA': 'role-na' };
-      return map[role] || 'role-disciple';
+      const map = {
+        Founder: "role-founder",
+        Admin: "role-admin",
+        Leader: "role-leader",
+        Disciple: "role-disciple",
+        NA: "role-na"
+      };
+      return map[role] || "role-disciple";
     }
 
     loadMembersPage();
