@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Apply — Disciples of Zamorak</title>
+  <title>Apply - Disciples of Zamorak</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ── HEADER ─────────────────────────── -->
   <header class="site-header">
     <div class="sigil"></div>
     <div>
@@ -16,66 +15,83 @@
       <div class="clan-sub">Castle Wars Clan · Est. Gielinor</div>
     </div>
     <div class="header-right">
-      <a class="header-discord" href="https://discord.gg/" target="_blank">⚔ Discord</a>
+      <a class="header-discord" href="https://discord.gg/EBqS3dxGbn" target="_blank">⚔ Discord</a>
     </div>
   </header>
 
-  <!-- ── NAV ────────────────────────────── -->
   <nav class="site-nav">
     <div class="nav-section-label">Navigation</div>
-
-    <a href="index.html">
-      <span class="nav-icon">🏰</span> Home
-    </a>
-
-    <a href="board.html">
-      <span class="nav-icon">📜</span> Message Board
-    </a>
-
-    <a href="members.html">
-      <span class="nav-icon">⚔</span> Members
-    </a>
-
-    <a href="apply.html" class="active">
-      <span class="nav-icon">🩸</span> Apply
-    </a>
-
+    <a href="index.html"><span class="nav-icon">🏰</span> Home</a>
+    <a href="board.html"><span class="nav-icon">📜</span> Message Board</a>
+    <a href="members.html"><span class="nav-icon">⚔</span> Members</a>
+    <a href="apply.html" class="active"><span class="nav-icon">🩸</span> Apply</a>
     <hr class="nav-divider">
-
     <div class="nav-section-label">Admin</div>
-    <a href="admin.html">
-      <span class="nav-icon">🔱</span> Admin Panel
-    </a>
+    <a href="admin.html"><span class="nav-icon">🔱</span> Admin Panel</a>
   </nav>
 
-  <!-- ── MAIN ───────────────────────── -->
   <main class="site-main">
-
-    <div class="card">
-      <h2>Join the Disciples</h2>
-
-      <label for="applyRsn">RSN</label>
-      <input id="applyRsn" maxlength="24" placeholder="RuneScape name">
-
-      <label for="applyCombat">Combat Level</label>
-      <input id="applyCombat" maxlength="3" placeholder="e.g. 126">
-
-      <label for="applyDiscord">Discord</label>
-      <input id="applyDiscord" maxlength="50" placeholder="optional">
-
-      <label for="applyReason">Why do you want to join?</label>
-      <textarea id="applyReason" maxlength="1000" placeholder="Tell us why"></textarea>
-
-      <!-- Honeypot -->
-      <input id="applyWebsite" class="hidden" tabindex="-1" autocomplete="off">
-
-      <div style="margin-top:12px">
-        <button class="primary" id="applyBtn">Submit Application</button>
-      </div>
-
-      <div id="applyStatus" style="margin-top:12px"></div>
+    <div class="page-header">
+      <h1>Join the <span>Disciples</span></h1>
+      <p>Step forward, tell us who you are, and why you want to stand under Zamorak's banner.</p>
     </div>
 
+    <div class="grid-2" style="align-items:start;">
+      <section class="card">
+        <div class="card-title">Submit Application</div>
+        <div class="form-group">
+          <label for="applyRsn">RSN</label>
+          <input type="text" id="applyRsn" maxlength="24" placeholder="RuneScape name">
+        </div>
+        <div class="form-group">
+          <label for="applyCombat">Combat Level</label>
+          <input type="text" id="applyCombat" maxlength="3" placeholder="e.g. 126">
+        </div>
+        <div class="form-group">
+          <label for="applyDiscord">Discord</label>
+          <input type="text" id="applyDiscord" maxlength="50" placeholder="optional">
+        </div>
+        <div class="form-group">
+          <label for="applyReason">Why do you want to join?</label>
+          <textarea id="applyReason" maxlength="1000" placeholder="Tell us why"></textarea>
+        </div>
+
+        <input id="applyWebsite" class="hidden" tabindex="-1" autocomplete="off" placeholder="Leave blank">
+        <button class="btn btn-primary" id="applyBtn">Submit Application</button>
+        <div id="applyStatus"></div>
+      </section>
+
+      <section>
+        <div class="card-title" style="margin-bottom:10px;">Application Notes</div>
+        <div class="lore-box">
+          We are looking for active players who enjoy Castle Wars, respect the clan, and want to contribute to the community around it.
+        </div>
+
+        <div class="card">
+          <div class="card-title">What To Include</div>
+          <div class="stack-list">
+            <div class="list-row">
+              <div>
+                <div class="row-title">Your RSN</div>
+                <div class="row-meta">Use the name you actively play on.</div>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="row-title">Combat Level</div>
+                <div class="row-meta">This helps leadership understand your account stage.</div>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="row-title">Reason For Joining</div>
+                <div class="row-meta">A short honest note is better than a long generic one.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script src="clan.js"></script>
