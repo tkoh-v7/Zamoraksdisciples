@@ -49,8 +49,7 @@
         <button class="btn btn-primary" onclick="doLogin()">🔱 Enter the Sanctum</button>
         <div id="loginStatus"></div>
         <p class="muted small" style="margin-top:14px;">
-          The admin key is your <span class="mono">ADMIN_KEY</span> Cloudflare Worker secret.
-          It is never stored in this page's source.
+          Your admin key is checked by the worker and exchanged for a secure admin session.
         </p>
       </section>
     </div>
@@ -139,15 +138,7 @@
   <script src="clan.js"></script>
   <script>
     // ── AUTH ──────────────────────────────────────────────────────────────
-    // The admin key is your Cloudflare ADMIN_KEY secret. It's sent as an
-    // x-admin-key request header. It is NEVER hardcoded in this file —
-    // only held in sessionStorage for the lifetime of the browser tab.
-
     const ROLE_HIERARCHY = ['Founder', 'Admin', 'Leader', 'Disciple', 'NA'];
-
-    function getAdminKey() {
-      return sessionStorage.getItem('doz_admin_key') || '';
-    }
 
     async function doLogin() {
       const keyInput = document.getElementById('loginPass');
@@ -162,10 +153,12 @@
       status.innerHTML = `<div class="status-msg">Verifying with server...</div>`;
 
       try {
-        // Validate the key by hitting a protected Worker endpoint.
-        // A 200 means the key is correct; 401 means it's wrong.
-        const res = await fetch(`${API_BASE}/api/clan/apps`, {
-          headers: { 'Content-Type': 'application/json', 'x-admin-key': key }
+        const base = await resolveApiBase();
+        const res = await fetch(`${base}/api/clan/admin/login`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
         });
 
         if (res.status === 401) {
@@ -178,8 +171,6 @@
           return;
         }
 
-        // Key verified — keep it in sessionStorage only (cleared on tab close)
-        sessionStorage.setItem('doz_admin_key', key);
         keyInput.value = '';
         status.innerHTML = '';
         showAdminPanel();
@@ -190,11 +181,12 @@
     }
 
     function adminLogout() {
-      sessionStorage.removeItem('doz_admin_key');
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('loginGate').classList.remove('hidden');
-      document.getElementById('logoutBtn').style.display = 'none';
-      document.getElementById('adminRoleLabel').textContent = '';
+      adminFetch('/api/clan/admin/logout', { method: 'POST' }).catch(() => null).finally(() => {
+        document.getElementById('adminPanel').classList.add('hidden');
+        document.getElementById('loginGate').classList.remove('hidden');
+        document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('adminRoleLabel').textContent = '';
+      });
     }
 
     function showAdminPanel() {
@@ -207,18 +199,14 @@
       loadAdminMembers();
     }
 
-    // Auto-resume if the key is already in sessionStorage from this tab
-    window.addEventListener('DOMContentLoaded', () => {
-      if (getAdminKey()) showAdminPanel();
-    });
-
-    // Authenticated fetch wrapper — attaches x-admin-key to every request
+    // Authenticated fetch wrapper — uses the secure admin session cookie
     async function adminFetch(path, options = {}) {
-      const res = await fetch(API_BASE + path, {
+      const base = await resolveApiBase();
+      const res = await fetch(base + path, {
         ...options,
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-key': getAdminKey(),
           ...(options.headers || {})
         }
       });
@@ -227,6 +215,13 @@
       if (!res.ok) throw new Error(data?.error || `Request failed (${res.status})`);
       return data;
     }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await adminFetch('/api/clan/admin/me');
+        showAdminPanel();
+      } catch {}
+    });
 
     // ── TABS ──────────────────────────────────────────────────────────────
     function switchTab(event, name) {
@@ -259,7 +254,7 @@
       const el = document.getElementById('appsFeed');
       el.innerHTML = "<p class='muted small'>Loading...</p>";
       try {
-        // Worker: GET /api/clan/apps  (x-admin-key required)
+        // Worker: GET /api/clan/apps  (secure admin session required)
         const items = await adminFetch('/api/clan/apps');
         allApplications = Array.isArray(items) ? items : [];
         renderApplications();
@@ -451,7 +446,7 @@
     async function loadAdminMembers() {
       const el = document.getElementById('adminMembersList');
       try {
-        const items = await api('/api/clan/members');
+        const items = await adminFetch('/api/clan/members/admin');
         if (!items.length) { el.innerHTML = "<p class='muted small'>No members.</p>"; return; }
         el.innerHTML = items.map(item => {
           const initial = (item.name || '?')[0].toUpperCase();
