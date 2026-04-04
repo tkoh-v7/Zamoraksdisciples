@@ -1042,7 +1042,7 @@ select option {
 .gap-12 { gap: 12px; }
 .mb-16 { margin-bottom: 16px; }
 .mb-8 { margin-bottom: 8px; }
-
+ 
 /* Grid 2 col */
 .grid-2 {
   display: grid;
