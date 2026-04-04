@@ -1,4 +1,9 @@
-const API_BASE = "https://cwl.r-2007scaper.workers.dev";
+const API_BASE_CANDIDATES = [
+  window.location.origin,
+  "https://cwl.r-2007scaper.workers.dev"
+].filter((value, index, list) => value && list.indexOf(value) === index);
+
+let apiBasePromise = null;
 
 function escapeHtml(str) {
   return String(str || "")
@@ -13,9 +18,33 @@ function fmt(ts) {
   return new Date(ts).toLocaleString();
 }
 
+async function resolveApiBase() {
+  if (!apiBasePromise) {
+    apiBasePromise = (async () => {
+      for (const base of API_BASE_CANDIDATES) {
+        try {
+          const res = await fetch(base + "/api/ping");
+          if (!res.ok) continue;
+
+          const data = await res.json().catch(() => null);
+          if (data?.ok === true && data?.service === "cw-api") {
+            return base;
+          }
+        } catch {}
+      }
+
+      return API_BASE_CANDIDATES[API_BASE_CANDIDATES.length - 1];
+    })();
+  }
+
+  return apiBasePromise;
+}
+
 async function api(path, options = {}) {
-  const res = await fetch(API_BASE + path, {
+  const base = await resolveApiBase();
+  const res = await fetch(base + path, {
     ...options,
+    credentials: options.credentials || "include",
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {})
